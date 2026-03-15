@@ -1,0 +1,7 @@
+# FastAdmin
+temp/
+runtime/
+vendor/
+node_modules/
+.DS_Store
+*.log
