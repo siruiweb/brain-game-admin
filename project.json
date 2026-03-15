@@ -1,0 +1,14 @@
+{
+  "name": "brain-simulator",
+  "uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "version": "2.4.13",
+  "isNew": false,
+  "compiler": {
+    "force": false,
+    "sourceMaps": true
+  },
+  "packages": {
+    "builder": {}
+  },
+  "id": "b1214f53-e851-4f15-8c23-394b2891c8d7"
+}

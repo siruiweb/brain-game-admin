@@ -1,7 +1,17 @@
-# FastAdmin
+# Cocos Creator
 temp/
-runtime/
-vendor/
-node_modules/
+library/
+local/
+build/
+*.meta
+
+# OS
 .DS_Store
-*.log
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Node
+node_modules/

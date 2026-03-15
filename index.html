@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Agent - VALHALLA-II v1.1.0</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--primary:#0f0f23;--accent:#4ecdc4;--accent2:#ff6b9d;--accent3:#a855f7;--accent4:#fbbf24;--text:#fff;--text-dim:#888}
+        body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:var(--primary);color:var(--text);min-height:100vh}
+        .bg{position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(78,205,196,0.15),transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(255,107,157,0.1),transparent 50%);z-index:0}
+        .app{position:relative;z-index:1;width:100%;height:100vh;display:flex;flex-direction:column}
+        .page{display:none;width:100%;height:100%;flex-direction:column;padding:20px;overflow-y:auto}
+        .page.active{display:flex}
+        #menuPage{justify-content:center;align-items:center;text-align:center}
+        .logo{font-size:80px;margin-bottom:20px;animation:pulse 3s ease-in-out infinite}
+        @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+        .title{font-size:36px;font-weight:bold;margin-bottom:10px}
+        .subtitle{font-size:16px;color:var(--text-dim);margin-bottom:40px}
+        .btn{padding:18px 40px;font-size:18px;border:none;border-radius:15px;cursor:pointer;margin:10px;transition:all 0.3s;font-weight:bold}
+        .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent3));color:#fff}
+        .btn-secondary{background:rgba(255,255,255,0.1);color:var(--text);border:1px solid rgba(255,255,255,0.2)}
+        .btn:hover{transform:translateY(-3px)}
+        .lang-switch{position:fixed;top:20px;right:20px;z-index:100}
+        .lang-btn{padding:10px 20px;background:rgba(255,255,255,0.1);border:1px solid var(--accent);border-radius:20px;color:var(--accent);cursor:pointer;font-size:14px}
+        .talent-title{font-size:24px;text-align:center;margin-bottom:20px}
+        .talent-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;padding:20px;max-width:600px;margin:0 auto}
+        .talent-card{background:rgba(255,255,255,0.05);border:2px solid transparent;border-radius:15px;padding:20px;text-align:center;cursor:pointer;transition:all 0.3s}
+        .talent-card:hover{background:rgba(255,255,255,0.1);border-color:var(--accent)}
+        .talent-card.selected{border-color:var(--accent4);background:rgba(251,191,36,0.1)}
+        .talent-icon{font-size:40px;margin-bottom:10px}
+        .talent-name{font-size:16px;font-weight:bold;margin-bottom:5px}
+        .talent-desc{font-size:12px;color:var(--text-dim)}
+        .game-header{display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.3);padding:15px;border-radius:15px;margin-bottom:15px;flex-wrap:wrap;gap:10px}
+        .day-badge{background:linear-gradient(135deg,var(--accent),var(--accent3));padding:8px 15px;border-radius:20px;font-weight:bold}
+        .stats-row{display:flex;gap:15px}
+        .attr-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+        .panel{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:15px}
+        .panel-title{font-size:18px;margin-bottom:15px}
+        .attr-list{display:flex;flex-direction:column;gap:10px}
+        .attr-item{display:flex;align-items:center;gap:10px}
+        .attr-icon{font-size:20px;width:30px}
+        .attr-bar{flex:1;height:12px;background:rgba(0,0,0,0.3);border-radius:6px;overflow:hidden}
+        .attr-fill{height:100%;border-radius:6px;transition:width 0.5s}
+        .fill-joy{background:linear-gradient(90deg,#ffd93d,#ff9500)}
+        .fill-anger{background:linear-gradient(90deg,#ff6b6b,#f00)}
+        .fill-sad{background:linear-gradient(90deg,#6c5ce7,#4a00e0)}
+        .fill-fear{background:linear-gradient(90deg,#a29bfe,#6c5ce7)}
+        .fill-love{background:linear-gradient(90deg,#fd79a8,#e84393)}
+        .fill-food{background:linear-gradient(90deg,#e17055,#d63031)}
+        .fill-money{background:linear-gradient(90deg,#fdcb6e,#f39c12)}
+        .fill-fame{background:linear-gradient(90deg,#74b9ff,#0984e3)}
+        .fill-sleep{background:linear-gradient(90deg,#a29bfe,#6c5ce7)}
+        .fill-play{background:linear-gradient(90deg,#55efc4,#00b894)}
+        .action-tabs{display:flex;gap:10px;margin-bottom:15px;overflow-x:auto}
+        .tab-btn{padding:10px 20px;border:none;border-radius:20px;background:rgba(255,255,255,0.1);color:var(--text);cursor:pointer;white-space:nowrap}
+        .tab-btn.active{background:linear-gradient(135deg,var(--accent),var(--accent3))}
+        .action-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+        .action-btn{padding:15px 10px;border:none;border-radius:12px;background:rgba(255,255,255,0.05);color:var(--text);cursor:pointer;font-size:14px;transition:all 0.3s}
+        .action-btn:hover{background:rgba(78,205,196,0.2)}
+        .action-btn .cost{display:block;font-size:11px;color:var(--accent4);margin-top:5px}
+        .timer-bar{height:4px;background:rgba(255,255,255,0.1);border-radius:2px;margin:10px 0}
+        .timer-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 1s}
+        .log-list{max-height:150px;overflow-y:auto;margin-top:10px}
+        .log-item{font-size:12px;padding:8px;background:rgba(0,0,0,0.2);border-radius:8px;margin-bottom:5px}
+        .achievements{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}
+        .achievement{padding:5px 10px;background:var(--accent4);border-radius:15px;font-size:11px;color:#000;font-weight:bold}
+        .game-over{position:fixed;inset:0;background:rgba(0,0,0,0.95);display:none;flex-direction:column;justify-content:center;align-items:center;text-align:center;z-index:200}
+        .game-over.show{display:flex}
+        .game-over-icon{font-size:80px;margin-bottom:20px}
+        .game-over-title{font-size:40px;margin-bottom:15px}
+        .game-over-title.fail{color:#ef4444}
+        .game-over-title.win{color:var(--accent4)}
+        .game-over-stats{font-size:18px;color:var(--text-dim)}
+        @media(max-width:600px){.talent-grid,.attr-grid{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="lang-switch"><button class="lang-btn" onclick="toggleLang()">EN/中</button></div>
+<div class="app">
+<div class="page active" id="menuPage">
+<div class="logo">🧠</div>
+<div class="title" id="gameTitle">头脑特工队</div>
+<div class="subtitle" id="gameSubtitle">VALHALLA-II v1.1.0</div>
+<div><button class="btn btn-primary" onclick="showTalentPage()" id="btnNewGame">新游戏</button><button class="btn btn-secondary" onclick="continueGame()" id="btnContinue">继续游戏</button></div>
+</div>
+<div class="page" id="talentPage">
+<div class="talent-title" id="talentTitle">选择天赋</div>
+<div class="talent-grid" id="talentGrid"></div>
+<button class="btn btn-primary" style="margin:20px auto;display:block" onclick="startGame()" id="btnStart">开始游戏</button>
+</div>
+<div class="page" id="gamePage">
+<div class="game-header"><div class="day-badge" id="dayBadge">第1天</div><div class="stats-row"><span>❤️ <span id="healthVal">100</span></span><span>🧠 <span id="mentalVal">100</span></span><span>⚡ <span id="energyVal">100</span></span><span>💰 <span id="moneyVal">1000</span></span></div></div>
+<div class="timer-bar"><div class="timer-fill" id="timerFill" style="width:100%"></div></div>
+<div class="attr-grid">
+<div class="panel"><div class="panel-title" id="emotionsTitle">情绪</div><div class="attr-list" id="emotionList"></div><div class="panel-title" style="margin-top:20px" id="desiresTitle">欲望</div><div class="attr-list" id="desireList"></div><div class="achievements" id="Achievements"></div></div>
+<div class="panel"><div class="action-tabs" id="actionTabs"></div><div class="action-grid" id="actionGrid"></div><div class="panel-title" style="margin-top:15px">日志</div><div class="log-list" id="logList"></div></div>
+</div>
+</div>
+</div>
+<div class="game-over" id="gameOver"><div class="game-over-icon" id="goIcon">💀</div><div class="game-over-title" id="goTitle">游戏结束</div><div class="game-over-stats" id="goStats"></div><div style="margin-top:30px"><button class="btn btn-primary" onclick="restartGame()">再来一次</button><button class="btn btn-secondary" onclick="goToMenu()">菜单</button></div></div>
+<script>
+const i18n={newGame:{zh:"新游戏",en:"New Game"},continue:{zh:"继续游戏",en:"Continue"},gameTitle:{zh:"头脑特工队",en:"Brain Agent"},talentTitle:{zh:"选择天赋",en:"Select Talent"},start:{zh:"开始游戏",en:"Start Game"},emotions:{zh:"情绪",en:"Emotions"},desires:{zh:"欲望",en:"Desires"}};
+let lang=localStorage.getItem("brainGame_lang")||"zh";
+function tr(key){return i18n[key]?(i18n[key][lang]||i18n[key].zh||key):key;}
+function toggleLang(){lang=lang==="zh"?"en":"zh";localStorage.setItem("brainGame_lang",lang);updateAllText();}
+function updateAllText(){document.getElementById("gameTitle").innerText=tr("gameTitle");document.getElementById("btnNewGame").innerText=tr("newGame");document.getElementById("btnContinue").innerText=tr("continue");document.getElementById("talentTitle").innerText=tr("talentTitle");document.getElementById("btnStart").innerText=tr("start");renderTalents();renderActions("emotions");renderStats();}
+let game={day:1,chapter:1,health:100,mental:100,energy:100,money:1000,talent:null,countdown:30,achievements:[],emotions:{joy:50,anger:30,sad:30,fear:20,love:60},desires:{food:60,money:70,fame:50,sleep:55,play:65},history:[],timer:null};
+const talents={lucky:{icon:"🌟",name:{zh:"天选之人",en:"Lucky Star"},desc:{zh:"正面+10%",en:"+10%"}},rich:{icon:"🏠",name:{zh:"富二代",en:"Rich Kid"},desc:{zh:"钱+5000",en:"Money+5000"}},genius:{icon:"🧠",name:{zh:"天才",en:"Genius"},desc:{zh:"学习+20%",en:"Learn+20%"}},healthy:{icon:"💪",name:{zh:"体育健将",en:"Athlete"},desc:{zh:"健康+20",en:"Health+20"}},charmer:{icon:"💕",name:{zh:"万人迷",en:"Charmer"},desc:{zh:"魅力+20%",en:"Charm+20%"}},zen:{icon:"🧘",name:{zh:"禅师",en:"Zen"},desc:{zh:"负面-20%",en:"Neg-20%"}},gambler:{icon:"🎰",name:{zh:"赌徒",en:"Gambler"},desc:{zh:"投资+30%",en:"Inv+30%"}};
+const emotions=[{key:"joy",icon:"😄",cls:"fill-joy"},{key:"anger",icon:"😤",cls:"fill-anger"},{key:"sad",icon:"😢",cls:"fill-sad"},{key:"fear",icon:"😰",cls:"fill-fear"},{key:"love",icon:"❤️",cls:"fill-love"}];
+const desires=[{key:"food",icon:"🍔",cls:"fill-food"},{key:"money",icon:"💰",cls:"fill-money"},{key:"fame",icon:"🏆",cls:"fill-fame"},{key:"sleep",icon:"😴",cls:"fill-sleep"},{key:"play",icon:"🎮",cls:"fill-play"}];
+const actions={emotions:[{n:{zh:"💰 赚钱",en:"💰 Earn"},c:0,e:{joy:15,money:30,sleep:-5}},{n:{zh:"🎮 玩游戏",en:"🎮 Play"},c:10,e:{joy:20,play:15,money:-10,sleep:-5}},{n:{zh:"🏋️ 健身",en:"🏋️ Exercise"},c:20,e:{anger:-20,health:10,energy:-10}},{n:{zh:"🧘 冥想",en:"🧘 Meditate"},c:0,e:{anger:-25,mental:15,sleep:5}},{n:{zh:"😢 哭",en:"😢 Cry"},c:0,e:{sad:-15,mental:5}},{n:{zh:"🍔 美食",en:"🍔 Food"},c:30,e:{sad:-10,food:25,money:-30,joy:10}},{n:{zh:"❤️ 告白",en:"❤️ Confess"},c:0,e:{love:25,joy:20,fear:15}},{n:{zh:"💕 约会",en:"💕 Date"},c:100,e:{love:30,money:-100,joy:25}}],desires:[{n:{zh:"🍔 吃饭",en:"🍔 Eat"},c:20,e:{food:35,joy:10,money:-20,health:5}},{n:{zh:"💵 省钱",en:"💵 Save"},c:0,e:{money:20,joy:5}},{n:{zh:"💼 工作",en:"💼 Work"},c:0,e:{money:100,energy:-30}},{n:{zh:"🏆 比赛",en:"🏆 Contest"},c:30,e:{fame:30,joy:25,money:-30}},{n:{zh:"😴 睡觉",en:"😴 Sleep"},c:0,e:{sleep:50,energy:40,health:10}},{n:{zh:"🎮 玩",en:"🎮 Play"},c:20,e:{play:35,joy:25,money:-20,sleep:-10}},{n:{zh:"✈️ 旅游",en:"✈️ Travel"},c:500,e:{play:50,joy:40,money:-500,energy:-20}}],social:[{n:{zh:"👥 交友",en:"👥 Friends"},c:0,e:{joy:15}},{n:{zh:"🎂 聚会",en:"🎂 Party"},c:50,e:{joy:30,money:-50}},{n:{zh:"🎁 送礼",en:"🎁 Gift"},c:50,e:{money:-50}}],health:[{n:{zh:"🏃 跑步",en:"🏃 Jog"},c:0,e:{health:15,energy:-15,joy:10}},{n:{zh:"🧘 瑜伽",en:"🧘 Yoga"},c:20,e:{health:10,mental:15}},{n:{zh:"🏥 看病",en:"🏥 Doctor"},c:50,e:{health:30,money:-50}}]};
+const events=[{t:{zh:"🌧️ 下雨",en:"🌧️ Rain"},e:{sad:10,joy:-5}},{t:{zh:"☀️ 晴天",en:"☀️ Sunny"},e:{joy:10,sad:-5}},{t:{zh:"💼 工作累",en:"💼 Work"},e:{anger:10,sleep:-10}},{t:{zh:"🎂 生日",en:"🎂 Birthday"},e:{joy:15,money:-10}},{t:{zh:"🐔 被骗",en:"🐔 Scam"},e:{money:-20,anger:15}},{t:{zh:"💪 健身",en:"💪 Fit"},e:{joy:10,health:10}},{t:{zh:"📱 手机坏",en:"📱 Broken"},e:{anger:20,money:-10}},{t:{zh:"💔 分手",en:"💔 Break up"},e:{love:-30,sad:25,mental:-15}},{t:{zh:"🎉 中奖",en:"🎉 Win"},e:{joy:35,money:500}},{t:{zh:"📚 读书",en:"📚 Read"},e:{joy:10}},{t:{zh:"😴 失眠",en:"😴 Insomnia"},e:{sleep:-25,energy:-15}},{t:{zh:"🤒 生病",en:"🤒 Sick"},e:{health:-20,money:-50}}];
+function showPage(id){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));document.getElementById(id).classList.add("active");}
+function showTalentPage(){showPage("talentPage");renderTalents();}
+function goToMenu(){showPage("menuPage");}
+function renderTalents(){document.getElementById("talentGrid").innerHTML=Object.entries(talents).map(([k,t])=>`<div class="talent-card" data-key="${k}" onclick="selectTalent('${k}')"><div class="talent-icon">${t.icon}</div><div class="talent-name">${lang==="zh"?t.name.zh:t.name.en}</div><div class="talent-desc">${lang==="zh"?t.desc.zh:t.desc.en}</div></div>`).join("");}
+function selectTalent(key){document.querySelectorAll(".talent-card").forEach(c=>c.classList.remove("selected"));document.querySelector(`[data-key="${key}"]`).classList.add("selected");game.talent=key;}
+function startGame(){if(!game.talent){alert(lang==="zh"?"请选择天赋!":"Select a talent!");return;}if(game.talent==="rich")game.money+=5000;if(game.talent==="healthy")game.health=120;game.day=1;game.chapter=1;game.countdown=30;game.achievements=[];game.history=[];showPage("gamePage");renderStats();renderActions("emotions");startGameLoop();addLog(lang==="zh"?"🎮 游戏开始!":"🎮 Game Start!");}
+function continueGame(){const s=localStorage.getItem("brainGameSave");if(s){Object.assign(game,JSON.parse(s));showPage("gamePage");renderStats();startGameLoop();addLog(lang==="zh"?"📂 继续游戏...":"📂 Loading...");}else{alert(lang==="zh"?"没有存档!":"No save!");}}
+function startGameLoop(){if(game.timer)clearInterval(game.timer);game.timer=setInterval(()=>tick(),1000);}
+function tick(){game.countdown--;if(game.countdown<=0){triggerEvent();nextDay();game.countdown=30;}document.getElementById("timerFill").style.width=(game.countdown/30*100)+"%";}
+function nextDay(){game.day++;game.emotions.joy=c(game.emotions.joy-2,0,100);game.desires.food=c(game.desires.food-5,0,100);game.desires.sleep=c(game.desires.sleep-8,0,100);game.energy=c(game.energy+10,0,100);if(game.day>=30&&game.chapter<2){game.chapter=2;addLog("📖 "+(lang==="zh"?"第2章":"Ch2"));}if(game.day>=60&&game.chapter<3){game.chapter=3;addLog("📖 "+(lang==="zh"?"第3章":"Ch3"));}if(game.day>=100&&game.chapter<4){game.chapter=4;addLog("📖 "+(lang==="zh"?"第4章":"Ch4"));}if(game.day>=200&&game.chapter<5){game.chapter=5;addLog("📖 "+(lang==="zh"?"第5章":"Ch5"));}checkAch();checkOver();saveGame();}
+function performAction(a,i,tab){if(game.money<a.c){addLog(lang==="zh"?"💸 钱不足!":"💸 No money!");return;}game.money-=a.c;applyEffects(a.e);addLog(`📅 ${lang==="zh"?"第"+game.day+"天":"Day "+game.day} - ${lang==="zh"?a.n.zh:a.n.en}`);checkAch();checkOver();renderStats();}
+function applyEffects(effects){for(let key in effects){let val=effects[key];if(key in game.emotions)game.emotions[key]=c(game.emotions[key]+val,0,100);else if(key in game.desires)game.desires[key]=c(game.desires[key]+val,0,100);else if(key==="money")game.money=Math.max(0,game.money+val);else if(key==="health")game.health=c(game.health+val,0,120);else if(key==="mental")game.mental=c(game.mental+val,0,100);else if(key==="energy")game.energy=c(game.energy+val,0,100);else if(key==="joy")game.emotions.joy=c(game.emotions.joy+val,0,100);}}
+function triggerEvent(){if(Math.random()>0.4)return;let evt=events[Math.floor(Math.random()*events.length)];applyEffects(evt.e);addLog(`📅 ${lang==="zh"?"第"+game.day+"天":"Day "+game.day} - ${lang==="zh"?evt.t.zh:evt.t.en}`);}
+function renderStats(){document.getElementById("dayBadge").innerText=(lang==="zh"?"第":"Day ")+game.day;document.getElementById("healthVal").innerText=Math.round(game.health);document.getElementById("mentalVal").innerText=Math.round(game.mental);document.getElementById("energyVal").innerText=Math.round(game.energy);document.getElementById("moneyVal").innerText=game.money;document.getElementById("emotionList").innerHTML=emotions.map(e=>`<div class="attr-item"><span class="attr-icon">${e.icon}</span><div class="attr-bar"><div class="attr-fill ${e.cls}" style="width:${game.emotions[e.key]}%"></div></div><span>${game.emotions[e.key]}</span></div>`).join("");document.getElementById("desireList").innerHTML=desires.map(d=>`<div class="attr-item"><span class="attr-icon">${d.icon}</span><div class="attr-bar"><div class="attr-fill ${d.cls}" style="width:${game.desires[d.key]}%"></div></div><span>${game.desires[d.key]}</span></div>`).join("");document.getElementById("Achievements").innerHTML=game.achievements.map(a=>`<span class="achievement">🏆</span>`).join("");}
+function renderActions(tab){const tabs=[{id:"emotions",label:"😤"},{id:"desires",label:"🍚"},{id:"social",label:"🎭"},{id:"health",label:"💪"}];document.getElementById("actionTabs").innerHTML=tabs.map(t=>`<button class="tab-btn ${tab===t.id?'active':''}" onclick="renderActions('${t.id}')">${t.label}</button>`).join("");document.getElementById("actionGrid").innerHTML=(actions[tab]||[]).map((a,i)==>`<button class="action-btn" onclick="performAction(actions.${tab}[${i}],${i},'${tab}')">${lang==="zh"?a.n.zh:a.n.en}<span class="cost">💰 ${a.c}</span></button>`).join("");}
+function addLog(text){let l=document.getElementById("logList");let i=document.createElement("div");i.className="log-item";i.innerText=text;l.insertBefore(i,l.firstChild);while(l.children.length>20)l.removeChild(l.lastChild);game.history.unshift(text);}
+function checkAch(){[["d10",game.day>=10],["d30",game.day>=30],["d100",game.day>=100],["d365",game.day>=365],["m1k",game.money>=1000],["m10k",game.money>=10000]].forEach(([k,v])=>{if(v&&!game.achievements.includes(k)){game.achievements.push(k);addLog("🏆 "+(lang==="zh"?"成就!":"Achievement!"));}});renderStats();}
+function checkOver(){let r="",w=false;if(game.health<=0)r=lang==="zh"?"身体垮掉!":"Health!";else if(game.mental<=0)r=lang==="zh"?"心理崩溃!":"Mental!";else if(game.energy<=0)r=lang==="zh"?"累死!":"Exhausted!";else if(game.emotions.anger>95)r=lang==="zh"?"气死!":"Anger!";else if(game.emotions.sad>95)r=lang==="zh"?"抑郁!":"Sad!";else if(game.money<=0&&game.day>10)r=lang==="zh"?"穷死!":"Poor!";else if(game.day>=365){w=true;r=lang==="zh"?"通关成功!":"You Win!";}if(r){clearInterval(game.timer);document.getElementById("gameOver").classList.add("show");document.getElementById("goIcon").innerText=w?"🎉":"💀";document.getElementById("goTitle").innerText=w?(lang==="zh"?"通关成功!":"You Win!"):(lang==="zh"?"游戏结束":"Game Over");document.getElementById("goTitle").className="game-over-title "+(w?"win":"fail");document.getElementById("goStats").innerText=r+" "+(lang==="zh"?"存活":"Survived: ")+game.day+(lang==="zh"?"天":" days");}}
+function restartGame(){document.getElementById("gameOver").classList.remove("show");game={day:1,chapter:1,health:100,mental:100,energy:100,money:1000,talent:null,countdown:30,achievements:[],emotions:{joy:50,anger:30,sad:30,fear:20,love:60},desires:{food:60,money:70,fame:50,sleep:55,play:65},history:[],timer:null};showTalentPage();}
+function saveGame(){localStorage.setItem("brainGameSave",JSON.stringify(game));}
+function c(v,min,max){return Math.max(min,Math.min(max,v));}
+updateAllText();
+</script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+{
+  "android": {
+    "packageName": "com.brain.simulator",
+    "targetSdkVersion": 26,
+    "minSdkVersion": 16,
+    "screenOrientation": "portrait",
+    "gameWidgetPackageName": "",
+    "gameWidgetClassName": "",
+    "keystore": "",
+    "keystoreAlias": "",
+    "keystorePassword": "",
+    "signConfig": "debug",
+    "isDebug": true,
+    "REMOTE_SERVER_ROOT": ""
+  },
+  "ios": {
+    "packageName": "com.brain.simulator",
+    "bundleId": "com.brain.simulator",
+    "targetVersion": "12.0",
+    "deviceFamily": "1",
+    "signConfig": "debug",
+    "isDebug": true,
+    "orientation": "portrait",
+    "REMOTE_SERVER_ROOT": "",
+    "ios_enable_jit": true
+  },
+  "mac": {
+    "packageName": "com.brain.simulator",
+    "bundleId": "com.brain.simulator",
+    "signConfig": "debug",
+    "isDebug": true,
+    "REMOTE_SERVER_ROOT": "",
+    "width": 1280,
+    "height": 720
+  },
+  "win32": {
+    "packageName": "com.brain.simulator",
+    "signConfig": "debug",
+    "isDebug": true,
+    "REMOTE_SERVER_ROOT": "",
+    "width": 1280,
+    "height": 720
+  },
+  "web": {
+    "dest": "web-mobile",
+    "md5Cache": true,
+    "sourceMaps": false,
+    "mergeAssets": false,
+    "optimizeHotUpdate": false,
+    "bundleConfigs": []
+  },
+  "current": "web",
+  "title": "brain-simulator",
+  "packageName": "org.cocos2d.demo",
+  "startScene": "512d3323-a56c-4ede-a188-39367f83aec8",
+  "excludeScenes": [],
+  "orientation": {
+    "landscapeRight": true,
+    "landscapeLeft": true,
+    "portrait": false,
+    "upsideDown": false
+  },
+  "webOrientation": "auto",
+  "inlineSpriteFrames": true,
+  "inlineSpriteFrames_native": true,
+  "mainCompressionType": "default",
+  "mainIsRemote": false,
+  "optimizeHotUpdate": false,
+  "md5Cache": true,
+  "nativeMd5Cache": true,
+  "encryptJs": true,
+  "xxteaKey": "715843b3-0b29-4f",
+  "zipCompressJs": true,
+  "fb-instant-games": {},
+  "android-instant": {
+    "packageName": "org.cocos2d.demo",
+    "REMOTE_SERVER_ROOT": "",
+    "pathPattern": "",
+    "scheme": "https",
+    "host": "",
+    "skipRecord": false,
+    "recordPath": ""
+  },
+  "openharmony": {
+    "packageName": "com.cocos.openharmony",
+    "REMOTE_SERVER_ROOT": ""
+  },
+  "appBundle": false,
+  "agreements": {}
+}
